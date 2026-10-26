@@ -242,11 +242,21 @@ body { background: linear-gradient(135deg, #cbd5e1 0%, #e2e8f0 100%); color: var
 <div id="goalSetupBox">
 <div class="form-group">
 <label class="form-label" id="goalInputLabel" for="goalTextInput">Mein heutiges Tagesziel:</label>
-<div style="display:flex; gap:8px;">
+<div style="display:flex; gap:8px; margin-bottom:8px;">
     <input type="text" id="goalTextInput" class="form-input" placeholder="z. B. 15 Min. Spazieren" style="flex:1;" />
-    <button type="button" class="btn-secondary" onclick="saveCustomGoalOption()" style="white-space:nowrap; padding:9px 10px;">+ zur Auswahl hinzufügen</button>
+    <button type="button" class="btn-secondary" onclick="saveCustomGoalOption()" style="white-space:nowrap; padding:9px 10px;">+ zur Auswahl</button>
 </div>
+<button type="button" class="btn-secondary" onclick="breakdownGoalWithSmartAssistant()" style="width:100%; background:var(--indigo-soft); color:var(--indigo); border-color:var(--indigo); margin-bottom:12px;">
+    <span>🪄 Ziel in kleine Schritte zerlegen</span>
+</button>
 </div>
+
+<!-- KI ASSISTENT ERGEBNIS-BOX -->
+<div id="smartAssistantBox" style="display:none; background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; padding:12px; margin-bottom:12px;">
+    <div style="font-size:11.5px; font-weight:700; color:var(--indigo); margin-bottom:8px;">🪄 Assistent: Machbare Mikroschritte für dich:</div>
+    <div id="smartAssistantResults" style="display:flex; flex-direction:column; gap:6px;"></div>
+</div>
+
 <div style="margin-bottom:12px;">
 <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Impulse zum Antippen:</div>
 <div class="chip-row" id="goalSuggestionChips"></div>
@@ -394,8 +404,9 @@ body { background: linear-gradient(135deg, #cbd5e1 0%, #e2e8f0 100%); color: var
     <strong>😊 1. Mood-Tracker</strong><br>
     Tippe auf das Gesicht, das am besten zu deinem Tag passt. Trage kurz ein, was passiert ist und was dir gut oder schlecht getan hat. Dies hilft dir, Muster zu erkennen.<br><br>
 
-    <strong>🎯 2. Meine Ziele</strong><br>
-    Setze dir ein Tages- oder Wochenziel. Am Abend kannst du im Ziele-Reiter reflektieren: Habe ich es erreicht? Wenn nicht, woran lag es? Speicherst du die Reflexion, wird sie ins Tagebuch verschoben, und du kannst ein neues Ziel setzen.<br><br>
+    <strong>🎯 2. Meine Ziele & Smart-Assistent</strong><br>
+    Setze dir ein Tages- oder Wochenziel. Fällt es dir schwer anzufangen? Tippe einfach ein grobes Ziel (z. B. "Aufräumen") ein und drücke auf <strong>"🪄 Ziel in kleine Schritte zerlegen"</strong>. Unser therapeutischer Smart-Assistent bricht dein Ziel komplett offline und sicher in kleine, machbare Schritte (Mikroschritte) herunter, die den Druck nehmen.<br>
+    Am Abend kannst du im Ziele-Reiter reflektieren: Habe ich es erreicht? Wenn nicht, woran lag es? Speicherst du die Reflexion, wird sie ins Tagebuch verschoben, und du kannst ein neues Ziel setzen.<br><br>
 
     <strong>🏆 3. Erfolgstagebuch</strong><br>
     Hier haben Misserfolge keinen Platz! Trage auch die kleinsten Schritte ein (z. B. "Ich bin heute aufgestanden"). Feiere diese Erfolge mit dem 🎉-Button!<br><br>
@@ -650,6 +661,7 @@ function switchGoalMode(mode) {
     document.getElementById('segWeeklyBtn').classList.toggle('active', mode === 'weekly');
     document.getElementById('goalInputLabel').textContent = mode === 'daily' ? 'Mein heutiges Tagesziel:' : 'Mein Wochenziel:';
     document.getElementById('goalSaveBtnLabel').textContent = mode === 'daily' ? 'Tagesziel festlegen' : 'Wochenziel festlegen';
+    document.getElementById('smartAssistantBox').style.display = 'none';
     renderGoalSuggestions();
     renderGoalSection();
 }
@@ -661,6 +673,71 @@ function saveCustomGoalOption() {
     safeStorage.setItem('aw_custom_goals', JSON.stringify(customGoals));
     renderGoalSuggestions();
     showToast('Zur Auswahl hinzugefügt!');
+}
+
+function breakdownGoalWithSmartAssistant() {
+    const goalText = document.getElementById('goalTextInput').value.trim().toLowerCase();
+    if (!goalText) { showToast('Bitte gib zuerst ein Ziel ein!'); return; }
+
+    let steps = [];
+
+    // Heuristische Analyse (NLP Keyword Matching)
+    if (goalText.includes('sport') || goalText.includes('bewegen') || goalText.includes('spazieren') || goalText.includes('laufen') || goalText.includes('training')) {
+        steps = [
+            "1. Nur die Schuhe/Sportkleidung anziehen (mehr nicht).",
+            "2. Für genau 5 Minuten starten (danach darfst du aufhören).",
+            "3. Dich danach für den Versuch loben."
+        ];
+    } else if (goalText.includes('aufräumen') || goalText.includes('putzen') || goalText.includes('haushalt') || goalText.includes('abwasch')) {
+        steps = [
+            "1. Einen Wecker auf exakt 10 Minuten stellen.",
+            "2. Nur eine einzige kleine Fläche (z.B. den Tisch) freiräumen.",
+            "3. Sobald der Wecker klingelt, sofort aufhören."
+        ];
+    } else if (goalText.includes('freund') || goalText.includes('anrufen') || goalText.includes('treffen') || goalText.includes('schreiben') || goalText.includes('sozial')) {
+        steps = [
+            "1. Nur eine kurze Nachricht schreiben ('Denke an dich').",
+            "2. Falls Anruf: Ein Zeitlimit setzen ('Habe nur 10 Min. Zeit').",
+            "3. Sich bewusst machen, dass man jederzeit absagen darf."
+        ];
+    } else if (goalText.includes('arbeiten') || goalText.includes('lernen') || goalText.includes('aufgabe') || goalText.includes('email') || goalText.includes('post')) {
+        steps = [
+            "1. Alles bereitlegen (Laptop, Stift, Papier) ohne anzufangen.",
+            "2. Nur die allererste Teilaufgabe für 5 Minuten machen.",
+            "3. Danach bewusst eine Pause machen und tief durchatmen."
+        ];
+    } else if (goalText.includes('essen') || goalText.includes('kochen') || goalText.includes('trinken') || goalText.includes('mahlzeit')) {
+        steps = [
+            "1. Ein Glas Wasser bereitstellen und einen Schluck trinken.",
+            "2. Nur die Zutaten aus dem Kühlschrank holen.",
+            "3. Ohne Ablenkung (kein Handy) den ersten Bissen wahrnehmen."
+        ];
+    } else if (goalText.includes('entspannen') || goalText.includes('meditieren') || goalText.includes('schlafen') || goalText.includes('ruhe')) {
+        steps = [
+            "1. Das Handy für 15 Minuten in einen anderen Raum legen.",
+            "2. Eine bequeme Position finden und 3x tief ein- und ausatmen.",
+            "3. Einfach nur da sein – es gibt jetzt nichts zu tun."
+        ];
+    } else {
+        // Fallback für allgemeine Ziele
+        steps = [
+            "1. Überlege: Was ist der allererste, kleinste Schritt?",
+            "2. Erlaube dir, es unperfekt zu machen (gut genug reicht!).",
+            "3. Teile dir die Zeit ein: Mache es nur für 5 bis 10 Minuten."
+        ];
+    }
+
+    const box = document.getElementById('smartAssistantBox');
+    const resultsDiv = document.getElementById('smartAssistantResults');
+
+    resultsDiv.innerHTML = steps.map(step => `
+        <button type="button" class="btn-secondary" style="text-align:left; font-size:12px; padding:8px; border:1px solid var(--indigo-soft);"
+            onclick="document.getElementById('goalTextInput').value='${step.replace(/'/g, "\\'")}'; document.getElementById('smartAssistantBox').style.display='none';">
+            ${step}
+        </button>
+    `).join('');
+
+    box.style.display = 'block';
 }
 
 function renderGoalSuggestions() {
