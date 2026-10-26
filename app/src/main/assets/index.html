@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Re:Mindful – Klinik- & Befindlichkeitsbegleiter</title>
+
+<style>
+:root {
+    --bg-page: #e2e8f0;
+    --bg-app: #f8fafc;
+    --surface: #ffffff;
+    --primary: #0d9488;
+    --primary-dark: #0f766e;
+    --primary-light: #ccfbf1;
+    --primary-soft: #f0fdfa;
+    --indigo: #4f46e5;
+    --indigo-soft: #eef2ff;
+    --amber: #d97706;
+    --amber-soft: #fffbeb;
+    --rose: #e11d48;
+    --rose-soft: #fff1f2;
+    --emerald: #059669;
+    --emerald-soft: #ecfdf5;
+    --text-main: #0f172a;
+    --text-muted: #475569;
+    --text-light: #94a3b8;
+    --border: #e2e8f0;
+    --radius-lg: 20px;
+    --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+body { background: linear-gradient(135deg, #cbd5e1 0%, #e2e8f0 100%); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 0; }
+.android-shell { width: 100%; max-width: 430px; height: 100vh; background: var(--bg-app); display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+.status-bar { background: var(--primary-dark); color: #ffffff; padding: 8px 20px 6px; font-size: 12px; font-weight: 600; display: none; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.app-header { background: var(--primary); color: #ffffff; padding: 12px 16px 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 10px rgba(13, 148, 136, 0.22); flex-shrink: 0; z-index: 10; }
+.app-title-wrap h1 { font-size: 18px; font-weight: 700; line-height: 1.2; }
+.app-title-wrap p { font-size: 11.5px; opacity: 0.9; margin-top: 2px; }
+.header-actions { display: flex; gap: 6px; }
+
+.icon-pill-btn { background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.3); color: #ffffff; padding: 6px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.icon-pill-btn.active-reminder { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+
+.push-banner { position: absolute; top: 42px; left: 12px; right: 12px; background: #1e293b; color: #ffffff; border-radius: 16px; padding: 13px 14px; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35); z-index: 100; display: none; align-items: center; justify-content: space-between; gap: 10px; }
+.push-banner.show { display: flex; }
+
+.app-content { flex: 1; overflow-y: auto; padding: 16px 14px 28px; }
+.tab-pane { display: none; } .tab-pane.active { display: block; }
+.card { background: var(--surface); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+
+.section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.section-badge { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.section-title { font-size: 16px; font-weight: 700; color: var(--text-main); }
+.section-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+.mood-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 10px 0 14px; }
+.mood-btn { background: #f8fafc; border: 2px solid var(--border); border-radius: 14px; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+.mood-btn .emoji { font-size: 26px; line-height: 1; }
+.mood-btn .lbl { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: center; }
+.mood-btn.selected { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(13, 148, 136, 0.18); }
+.mood-btn[data-level="5"].selected { background: #ecfdf5; border-color: #10b981; }
+.mood-btn[data-level="4"].selected { background: #f0fdf4; border-color: #22c55e; }
+.mood-btn[data-level="3"].selected { background: #fefce8; border-color: #eab308; }
+.mood-btn[data-level="2"].selected { background: #fff7ed; border-color: #f97316; }
+.mood-btn[data-level="1"].selected { background: #fff1f2; border-color: #f43f5e; }
+
+.form-group { margin-bottom: 12px; }
+.form-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-main); margin-bottom: 5px; }
+.form-input, .form-textarea { width: 100%; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 13.5px; color: var(--text-main); }
+.form-textarea { resize: vertical; min-height: 68px; line-height: 1.45; }
+.form-input:focus, .form-textarea:focus { outline: none; background: #ffffff; border-color: var(--primary); }
+
+.btn-primary { width: 100%; background: var(--primary); color: #ffffff; border: none; border-radius: 14px; padding: 12px 16px; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border); border-radius: 12px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+.segmented-control { display: grid; grid-template-columns: 1fr 1fr; background: #e2e8f0; padding: 4px; border-radius: 13px; margin-bottom: 14px; }
+.seg-btn { border: none; background: transparent; padding: 8px 10px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+.seg-btn.active { background: #ffffff; color: var(--text-main); box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08); }
+
+.goal-eval-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0 12px; }
+.eval-choice-btn { padding: 10px; border-radius: 12px; border: 2px solid var(--border); background: #f8fafc; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.eval-choice-btn.success.active { background: var(--emerald-soft); border-color: var(--emerald); color: #065f46; }
+.eval-choice-btn.fail.active { background: var(--rose-soft); border-color: var(--rose); color: #9f1239; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip { border: 1px solid var(--border); background: #f8fafc; color: var(--text-muted); padding: 5px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600; cursor: pointer; }
+.chip.active { background: var(--amber-soft); border-color: #f59e0b; color: #92400e; }
+
+.date-divider { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 4px 8px; display: flex; align-items: center; gap: 8px; }
+.date-divider::after { content: ""; flex: 1; height: 1px; background: #cbd5e1; }
+
+.diary-item { background: #ffffff; border-radius: 16px; padding: 13px 14px; margin-bottom: 10px; border: 1px solid var(--border); border-left: 5px solid var(--primary); box-shadow: var(--shadow-sm); }
+.diary-item.type-mood { border-left-color: #0d9488; }
+.diary-item.type-goal { border-left-color: #4f46e5; }
+.diary-item.type-win  { border-left-color: #d97706; }
+
+.diary-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
+.diary-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.badge-mood { background: var(--primary-soft); color: var(--primary-dark); }
+.badge-goal { background: var(--indigo-soft); color: var(--indigo); }
+.badge-win  { background: var(--amber-soft); color: var(--amber); }
+
+.diary-time { font-size: 11.5px; color: var(--text-light); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.action-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 15px; display:flex; align-items:center; justify-content:center; }
+.action-btn:hover { color: var(--text-main); }
+.action-btn.del:hover { color: var(--rose); }
+
+.diary-detail-box { font-size: 12.5px; color: var(--text-main); line-height: 1.45; margin-top: 6px; background: #f8fafc; padding: 8px 10px; border-radius: 10px; }
+.diary-detail-box strong { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
+
+.empty-state { text-align: center; padding: 28px 16px; color: var(--text-muted); }
+.empty-icon { font-size: 36px; margin-bottom: 8px; }
+
+.bottom-nav { background: #ffffff; border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px 6px 10px; flex-shrink: 0; z-index: 20; }
+.nav-item { border: none; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; cursor: pointer; color: var(--text-muted); position: relative; }
+.nav-icon-pill { width: 48px; height: 28px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+.nav-item svg { width: 20px; height: 20px; stroke-width: 2.2; }
+.nav-label { font-size: 10.5px; font-weight: 700; }
+.nav-item.active { color: var(--primary-dark); }
+.nav-item.active .nav-icon-pill { background: var(--primary-light); }
+.nav-badge { position: absolute; top: 3px; right: 16px; background: var(--rose); color: #ffffff; font-size: 9.5px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+
+.modal-backdrop { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(2px); z-index: 80; display: none; align-items: flex-end; justify-content: center; }
+.modal-backdrop.open { display: flex; }
+.modal-sheet { background: #ffffff; width: 100%; border-radius: 24px 24px 0 0; padding: 20px 18px 24px; max-height: 86%; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.close-btn { border: none; background: #f1f5f9; width: 32px; height: 32px; border-radius: 999px; font-size: 16px; cursor: pointer; color: var(--text-muted); }
+
+.toast { position: absolute; bottom: 78px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0f172a; color: #ffffff; padding: 10px 16px; border-radius: 999px; font-size: 12.5px; font-weight: 600; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); opacity: 0; pointer-events: none; transition: all 0.22s ease; z-index: 90; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.switch-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 12px; }
+.toggle-input { width: 46px; height: 26px; appearance: none; background: #cbd5e1; border-radius: 999px; position: relative; cursor: pointer; transition: background 0.2s; }
+.toggle-input::after { content: ""; width: 20px; height: 20px; background: #ffffff; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.2s; }
+.toggle-input:checked { background: var(--primary); }
+.toggle-input:checked::after { transform: translateX(20px); }
+</style>
+</head>
+<body>
+
+<div class="android-shell">
+<div class="status-bar">
+<span id="statusClock">08:00</span>
+<div style="display:flex; gap:8px;">
+<span id="reminderStatusDot" style="display:none;">🔔</span>
+<span>5G</span>
+<span>100% 🔋</span>
+</div>
+</div>
+
+<div id="pushBanner" class="push-banner">
+<div style="display:flex; align-items:center; gap:10px;">
+<span style="font-size:22px;">🔔</span>
+<div>
+<div style="font-size:12.5px; font-weight:700;">Tägliche Achtsamkeits-Erinnerung</div>
+<div id="pushBannerText" style="font-size:11.5px; opacity:0.88;">Zeit für deinen Tagebuch-Eintrag.</div>
+</div>
+</div>
+<div style="display:flex; gap:6px;">
+<button onclick="handlePushAction()" style="background:#14b8a6; color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer;">Öffnen</button>
+<button onclick="closePushBanner()" style="background:rgba(255,255,255,0.15); color:#fff; border:none; padding:6px 8px; border-radius:8px; font-size:11.5px; cursor:pointer;">✕</button>
+</div>
+</div>
+
+<header class="app-header">
+<div class="app-title-wrap">
+<h1>Re:Mindful</h1>
+<p id="currentDateSubtitle">Klinik- & Befindlichkeitsbegleiter</p>
+</div>
+<div class="header-actions">
+<button class="icon-pill-btn" onclick="openModal('helpModal')">
+<span>❓</span>
+<span>Hilfe</span>
+</button>
+<button id="headerReminderBtn" class="icon-pill-btn" onclick="openModal('reminderModal')">
+<span>🔔</span>
+<span id="headerReminderLabel">Erinnerung</span>
+</button>
+</div>
+</header>
+
+<main class="app-content">
+<!-- 1. MOOD-TRACKER -->
+<section id="tab-mood" class="tab-pane active">
+<div class="card">
+<div class="section-header">
+<div class="section-badge" style="background:var(--primary-soft); color:var(--primary-dark);">😊</div>
+<div>
+<div class="section-title">1. Mood-Tracker</div>
+<div class="section-sub">Wie fühlst du dich am heutigen Tag?</div>
+</div>
+</div>
+
+<label class="form-label">Wähle deine aktuelle Stimmung:</label>
+<div class="mood-grid" id="moodGrid">
+<button type="button" class="mood-btn" data-level="5" data-emoji="😄" data-label="Super fröhlich" onclick="selectMood(this)"><span class="emoji">😄</span><span class="lbl">Super</span></button>
+<button type="button" class="mood-btn" data-level="4" data-emoji="🙂" data-label="Gut & ruhig" onclick="selectMood(this)"><span class="emoji">🙂</span><span class="lbl">Gut</span></button>
+<button type="button" class="mood-btn" data-level="3" data-emoji="😐" data-label="Neutral / Mittel" onclick="selectMood(this)"><span class="emoji">😐</span><span class="lbl">Neutral</span></button>
+<button type="button" class="mood-btn" data-level="2" data-emoji="😔" data-label="Betrübt" onclick="selectMood(this)"><span class="emoji">😔</span><span class="lbl">Betrübt</span></button>
+<button type="button" class="mood-btn" data-level="1" data-emoji="😢" data-label="Tiefst betrübt" onclick="selectMood(this)"><span class="emoji">😢</span><span class="lbl">Tieftraurig</span></button>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="moodHappened">📋 Was ist an diesem Tag geschehen?</label>
+<textarea id="moodHappened" class="form-textarea" placeholder="z. B. Einzeltherapie, Spaziergang, Gespräch..."></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" for="moodPositive">☀️ Was war heute positiv für mich?</label>
+<textarea id="moodPositive" class="form-textarea" placeholder="Was hat mir gutgetan?"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" for="moodNegative">🌧️ Was war heute negativ für mich?</label>
+<textarea id="moodNegative" class="form-textarea" placeholder="Was hat mich belastet?"></textarea>
+</div>
+
+<button type="button" class="btn-primary" onclick="saveMoodEntry()">
+<span>💾</span>
+<span>Befindlichkeit im Tagebuch speichern</span>
+</button>
+</div>
+</section>
+
+<!-- 2. MEINE ZIELE -->
+<section id="tab-goals" class="tab-pane">
+<div class="card">
+<div class="section-header">
+<div class="section-badge" style="background:var(--indigo-soft); color:var(--indigo);">🎯</div>
+<div>
+<div class="section-title">2. Meine Ziele</div>
+<div class="section-sub">Tagesziel & Wochenziel</div>
+</div>
+</div>
+
+<div class="segmented-control">
+<button type="button" id="segDailyBtn" class="seg-btn active" onclick="switchGoalMode('daily')">☀️ Tagesziel</button>
+<button type="button" id="segWeeklyBtn" class="seg-btn" onclick="switchGoalMode('weekly')">🌱 Wochenziel</button>
+</div>
+
+<div id="goalSetupBox">
+<div class="form-group">
+<label class="form-label" id="goalInputLabel" for="goalTextInput">Mein heutiges Tagesziel:</label>
+<div style="display:flex; gap:8px;">
+    <input type="text" id="goalTextInput" class="form-input" placeholder="z. B. 15 Min. Spazieren" style="flex:1;" />
+    <button type="button" class="btn-secondary" onclick="saveCustomGoalOption()" style="white-space:nowrap; padding:9px 10px;">+ zur Auswahl hinzufügen</button>
+</div>
+</div>
+<div style="margin-bottom:12px;">
+<div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:6px;">Impulse zum Antippen:</div>
+<div class="chip-row" id="goalSuggestionChips"></div>
+</div>
+<button type="button" class="btn-primary" style="background:var(--indigo);" onclick="setNewGoal()">
+<span>🎯</span>
+<span id="goalSaveBtnLabel">Tagesziel festlegen</span>
+</button>
+</div>
+
+<div id="goalActiveBox" style="display:none; margin-top:16px; padding-top:16px; border-top:1.5px dashed var(--border);">
+<div style="background:var(--indigo-soft); border-radius:14px; padding:12px 14px; margin-bottom:12px;">
+<div style="font-size:11px; font-weight:700; color:var(--indigo); text-transform:uppercase;" id="activeGoalHeader">Aktives Ziel</div>
+<div style="font-size:14.5px; font-weight:700; color:var(--text-main); margin-top:3px;" id="activeGoalText"></div>
+</div>
+
+<label class="form-label">Rückblick: Hast du das Ziel erreicht?</label>
+<div class="goal-eval-grid">
+<button type="button" id="evalSuccessBtn" class="eval-choice-btn success" onclick="selectGoalEvaluation(true)"><span>✅</span><span>Erreicht</span></button>
+<button type="button" id="evalFailBtn" class="eval-choice-btn fail" onclick="selectGoalEvaluation(false)"><span>⭕</span><span>Nicht erreicht</span></button>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="goalReasonInput">🔍 Was hat zum Erreichen/Scheitern geführt?</label>
+<textarea id="goalReasonInput" class="form-textarea" placeholder="Welche Umstände waren entscheidend?"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label" for="goalDifferentInput">💡 Was würde ich anders machen?</label>
+<textarea id="goalDifferentInput" class="form-textarea" placeholder="Welcher nächste Schritt hilft mir?"></textarea>
+</div>
+
+<button type="button" class="btn-primary" style="background:var(--indigo);" onclick="completeGoalReflection()">
+<span>📖</span>
+<span>Reflexion im Tagebuch speichern</span>
+</button>
+</div>
+</div>
+</section>
+
+<!-- 3. ERFOLGSTAGEBUCH -->
+<section id="tab-wins" class="tab-pane">
+<div class="card">
+<div class="section-header">
+<div class="section-badge" style="background:var(--amber-soft); color:var(--amber);">🏆</div>
+<div>
+<div class="section-title">3. Erfolgstagebuch</div>
+<div class="section-sub">Feiere deine großen & kleinen Erfolge</div>
+</div>
+</div>
+
+<div style="background:var(--amber-soft); border:1px solid #fde68a; border-radius:12px; padding:10px 12px; font-size:12px; color:#92400e; margin-bottom:12px;">
+✨ <strong>Nur positive Einträge:</strong> Misserfolge haben hier Pause!
+</div>
+
+<label class="form-label">Art des Erfolgs:</label>
+<div class="chip-row" id="winSizeChips">
+<button type="button" class="chip active" onclick="selectWinCategory(this, 'Kleiner Erfolg 🌱')">Kleiner Erfolg 🌱</button>
+<button type="button" class="chip" onclick="selectWinCategory(this, 'Großer Erfolg 🌟')">Großer Erfolg 🌟</button>
+<button type="button" class="chip" onclick="selectWinCategory(this, 'Selbstfürsorge 💛')">Selbstfürsorge 💛</button>
+<button type="button" class="chip" onclick="selectWinCategory(this, 'Mutiger Schritt 🦁')">Mutiger Schritt 🦁</button>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="winTextInput">🌟 Worauf bin ich heute stolz?</label>
+<textarea id="winTextInput" class="form-textarea" placeholder="z. B. Ich habe heute offen gesprochen..."></textarea>
+</div>
+
+<button type="button" class="btn-primary" style="background:var(--amber);" onclick="saveWinEntry()">
+<span>🎉</span>
+<span>Erfolg eintragen & feiern!</span>
+</button>
+</div>
+
+<div class="card">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<span style="font-size:14px; font-weight:700;">🌟 Gesammelte Erfolge</span>
+<span id="winsCountBadge" style="font-size:11.5px; font-weight:700; color:var(--amber); background:var(--amber-soft); padding:3px 9px; border-radius:999px;">0 Erfolge</span>
+</div>
+<div id="winsWallList"></div>
+</div>
+</section>
+
+<!-- 4. TAGEBUCH -->
+<section id="tab-diary" class="tab-pane">
+<div class="card">
+<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px;">
+<div class="section-header" style="margin-bottom:0;">
+<div class="section-badge" style="background:#f1f5f9; color:#334155;">📖</div>
+<div>
+<div class="section-title">4. Tagebuch</div>
+<div class="section-sub">Chronologisch nach Datum & Uhrzeit</div>
+</div>
+</div>
+<button type="button" class="btn-secondary" style="background:var(--primary-soft); color:var(--primary-dark);" onclick="openModal('pdfModal')">
+<span>📄</span>
+<span>PDF</span>
+</button>
+</div>
+
+<div class="chip-row" style="margin-bottom:6px;">
+<button type="button" class="chip active" onclick="setDiaryFilter(this, 'all')">Alle</button>
+<button type="button" class="chip" onclick="setDiaryFilter(this, 'mood')">😊 Mood</button>
+<button type="button" class="chip" onclick="setDiaryFilter(this, 'daily_goal')">☀️ Tagesziele</button>
+<button type="button" class="chip" onclick="setDiaryFilter(this, 'weekly_goal')">🌱 Wochenziele</button>
+<button type="button" class="chip" onclick="setDiaryFilter(this, 'win')">🏆 Erfolge</button>
+</div>
+</div>
+
+<div id="diaryEntriesContainer"></div>
+</section>
+</main>
+
+<!-- TASKLEISTE -->
+<nav class="bottom-nav">
+<button type="button" class="nav-item active" data-tab="mood" onclick="switchTab('mood')">
+<div class="nav-icon-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></div>
+<span class="nav-label">Mood</span>
+</button>
+<button type="button" class="nav-item" data-tab="goals" onclick="switchTab('goals')">
+<div class="nav-icon-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle></svg></div>
+<span class="nav-label">Ziele</span>
+</button>
+<button type="button" class="nav-item" data-tab="wins" onclick="switchTab('wins')">
+<div class="nav-icon-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg></div>
+<span class="nav-label">Erfolge</span>
+</button>
+<button type="button" class="nav-item" data-tab="diary" onclick="switchTab('diary')">
+<span id="diaryCountBadge" class="nav-badge" style="display:none;">0</span>
+<div class="nav-icon-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></div>
+<span class="nav-label">Tagebuch</span>
+</button>
+</nav>
+
+<!-- HILFE MODAL -->
+<div id="helpModal" class="modal-backdrop">
+<div class="modal-sheet">
+<div class="modal-header">
+<h3>❓ Hilfe & FAQ</h3>
+<button type="button" class="close-btn" onclick="closeModal('helpModal')">✕</button>
+</div>
+<div style="font-size:13px; line-height:1.5; color:var(--text-main); margin-bottom:12px;">
+    <strong>Wofür ist diese App?</strong><br>
+    Re:Mindful hilft dir, deine Stimmung, Tagesziele und persönliche Erfolge übersichtlich festzuhalten. Besonders in einer Klinikzeit oder bei therapeutischen Maßnahmen ist es wertvoll, einen Rückblick zu haben.<br><br>
+
+    <strong>😊 1. Mood-Tracker</strong><br>
+    Tippe auf das Gesicht, das am besten zu deinem Tag passt. Trage kurz ein, was passiert ist und was dir gut oder schlecht getan hat. Dies hilft dir, Muster zu erkennen.<br><br>
+
+    <strong>🎯 2. Meine Ziele</strong><br>
+    Setze dir ein Tages- oder Wochenziel. Am Abend kannst du im Ziele-Reiter reflektieren: Habe ich es erreicht? Wenn nicht, woran lag es? Speicherst du die Reflexion, wird sie ins Tagebuch verschoben, und du kannst ein neues Ziel setzen.<br><br>
+
+    <strong>🏆 3. Erfolgstagebuch</strong><br>
+    Hier haben Misserfolge keinen Platz! Trage auch die kleinsten Schritte ein (z. B. "Ich bin heute aufgestanden"). Feiere diese Erfolge mit dem 🎉-Button!<br><br>
+
+    <strong>📖 4. Tagebuch & PDF-Export</strong><br>
+    Hier findest du alle Einträge chronologisch sortiert. Über den "PDF"-Button im Tagebuch kannst du bestimmte Tage (oder alle) als PDF-Datei speichern. Diese kannst du dann z. B. in einer Therapiestunde vorzeigen.<br><br>
+
+    <strong>🔔 Benachrichtigungen</strong><br>
+    Aktiviere im Menü oben rechts ("Erinnerung") eine Uhrzeit, z. B. 19:00 Uhr. Dein Handy meldet sich dann jeden Tag bei dir, auch wenn die App geschlossen ist!
+</div>
+</div>
+</div>
+
+<!-- REMINDER MODAL -->
+<div id="reminderModal" class="modal-backdrop">
+<div class="modal-sheet">
+<div class="modal-header">
+<h3>🔔 Tägliche Erinnerung</h3>
+<button type="button" class="close-btn" onclick="closeModal('reminderModal')">✕</button>
+</div>
+<div class="switch-row">
+<div>
+<div style="font-size:13.5px; font-weight:700;">Benachrichtigung aktiv</div>
+<div style="font-size:11.5px; color:var(--text-muted);">Tägliche Erinnerung</div>
+</div>
+<input type="checkbox" id="reminderEnabledToggle" class="toggle-input" onchange="saveReminderSettings()" />
+</div>
+<div class="form-group">
+<label class="form-label" for="reminderTimeInput">⏰ Uhrzeit:</label>
+<input type="time" id="reminderTimeInput" class="form-input" value="19:00" onchange="saveReminderSettings()" />
+</div>
+<div style="display:flex; gap:8px; margin-top:14px;">
+<button type="button" class="btn-secondary" style="flex:1;" onclick="triggerTestNotification()">🔔 Testen</button>
+<button type="button" class="btn-primary" style="flex:1;" onclick="closeModal('reminderModal')">✅ Speichern</button>
+</div>
+</div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="modal-backdrop" style="z-index:100;">
+    <div class="modal-sheet" style="max-height:40%;">
+        <h3 id="confirmTitle" style="margin-bottom:10px;">Bist du sicher?</h3>
+        <p id="confirmText" style="font-size:14px; margin-bottom:20px;"></p>
+        <div style="display:flex; gap:10px;">
+            <button type="button" class="btn-secondary" style="flex:1;" onclick="closeModal('confirmModal')">Nein</button>
+            <button type="button" class="btn-primary" style="flex:1; background:var(--rose);" id="confirmYesBtn">Ja</button>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-backdrop" style="z-index:90;">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <h3>✏️ Eintrag bearbeiten</h3>
+            <button type="button" class="close-btn" onclick="closeModal('editModal')">✕</button>
+        </div>
+        <div id="editMoodWrap" style="display:none;">
+            <label class="form-label">Geschehen:</label><textarea id="emHappened" class="form-textarea" style="margin-bottom:8px;"></textarea>
+            <label class="form-label">Positiv:</label><textarea id="emPos" class="form-textarea" style="margin-bottom:8px;"></textarea>
+            <label class="form-label">Negativ:</label><textarea id="emNeg" class="form-textarea" style="margin-bottom:8px;"></textarea>
+        </div>
+        <div id="editGoalWrap" style="display:none;">
+            <label class="form-label">Ziel:</label><input type="text" id="egText" class="form-input" style="margin-bottom:8px;"/>
+            <label class="form-label">Ursache:</label><textarea id="egReason" class="form-textarea" style="margin-bottom:8px;"></textarea>
+            <label class="form-label">Anders machen:</label><textarea id="egDiff" class="form-textarea" style="margin-bottom:8px;"></textarea>
+        </div>
+        <div id="editWinWrap" style="display:none;">
+            <label class="form-label">Erfolg:</label><textarea id="ewText" class="form-textarea" style="margin-bottom:8px;"></textarea>
+        </div>
+        <button type="button" class="btn-primary" style="margin-top:10px;" onclick="saveEdit()">Änderungen speichern</button>
+    </div>
+</div>
+
+<!-- STREAK MODAL -->
+<div id="streakModal" class="modal-backdrop" style="z-index:100;">
+    <div class="modal-sheet" style="text-align:center;">
+        <div style="font-size:48px; margin-bottom:10px;">🎉</div>
+        <h3 style="margin-bottom:10px;">Glückwunsch!</h3>
+        <p style="font-size:14px; margin-bottom:20px; color:var(--text-muted);">
+            Du hast 3 Tage in Folge das Tagebuch genutzt. Das ist ein toller Schritt für deine Achtsamkeit. Weiter so!
+        </p>
+        <button type="button" class="btn-primary" onclick="closeModal('streakModal')">Klasse!</button>
+    </div>
+</div>
+
+<!-- PDF MODAL -->
+<div id="pdfModal" class="modal-backdrop">
+<div class="modal-sheet">
+<div class="modal-header">
+<h3>📄 PDF-Export</h3>
+<button type="button" class="close-btn" onclick="closeModal('pdfModal')">✕</button>
+</div>
+<div class="form-group">
+<label class="form-label" for="pdfPatientName">👤 Name / Initialen (optional):</label>
+<input type="text" id="pdfPatientName" class="form-input" placeholder="z. B. M. Muster" />
+</div>
+<div class="form-group">
+<label class="form-label" for="pdfStationNote">🏥 Station / Notiz (optional):</label>
+<input type="text" id="pdfStationNote" class="form-input" placeholder="z. B. Station B2" />
+</div>
+<div class="form-group">
+<label class="form-label" for="pdfDateFilter">📅 Zeitraum:</label>
+<select id="pdfDateFilter" class="form-input" onchange="toggleCustomDate()">
+    <option value="all">Alle Tage</option>
+    <option value="today">Nur heute</option>
+    <option value="last7">Letzte 7 Tage</option>
+    <option value="custom">Benutzerdefiniert...</option>
+</select>
+</div>
+<div id="pdfCustomDateWrap" style="display:none; gap:10px; margin-bottom:12px;">
+    <div style="flex:1;">
+        <label class="form-label">Von:</label>
+        <input type="date" id="pdfStartDate" class="form-input" />
+    </div>
+    <div style="flex:1;">
+        <label class="form-label">Bis:</label>
+        <input type="date" id="pdfEndDate" class="form-input" />
+    </div>
+</div>
+<button type="button" class="btn-primary" onclick="downloadDiaryAsPDF()">
+<span>⬇️</span>
+<span>PDF-Datei herunterladen (.pdf)</span>
+</button>
+</div>
+</div>
+
+<div id="toastMsg" class="toast">Gespeichert!</div>
+</div>
+
+<script>
+const safeStorage = {
+    getItem(k) { try { return localStorage.getItem(k); } catch(e) { return null; } },
+    setItem(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+};
+
+let diaryEntries = JSON.parse(safeStorage.getItem('aw_entries') || '[]');
+let activeGoals = JSON.parse(safeStorage.getItem('aw_goals') || '{"daily":null,"weekly":null}');
+let customGoals = JSON.parse(safeStorage.getItem('aw_custom_goals') || '{"daily":[],"weekly":[]}');
+let reminderConfig = JSON.parse(safeStorage.getItem('aw_remind') || '{"enabled":false,"time":"19:00","note":"Zeit für deinen Tagebuch-Eintrag."}');
+let unreadCount = JSON.parse(safeStorage.getItem('aw_unread') || '0');
+let streakData = JSON.parse(safeStorage.getItem('aw_streak') || '{"lastDate":"","count":0,"lastNotified":0}');
+
+let selectedMood = null;
+let currentGoalMode = 'daily';
+let selectedGoalAchieved = null;
+let selectedWinCategory = 'Kleiner Erfolg 🌱';
+let currentDiaryFilter = 'all';
+
+const GOAL_SUGGESTIONS = {
+    daily: ['15 Min. Spaziergang', 'Atemübung bei Anspannung', 'Regelmäßige Mahlzeiten', 'Gespräch auf Station führen'],
+    weekly: ['Belastungsgrenzen ansprechen', 'Jeden Tag 1 Erfolg würdigen', 'Feste Ruhezeiten einhalten']
+};
+
+function initApp() {
+    updateClock();
+    setInterval(updateClock, 10000);
+    setInterval(checkReminder, 5000);
+    renderGoalSuggestions();
+    renderGoalSection();
+    renderWinsWall();
+    updateBadge();
+    renderDiary();
+    syncReminderUI();
+}
+
+function updateClock() {
+    const now = new Date();
+    document.getElementById('statusClock').textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    document.getElementById('currentDateSubtitle').textContent = `Heute: ${now.toLocaleDateString('de-DE', {weekday:'short', day:'2-digit', month:'2-digit', year:'numeric'})}`;
+}
+
+function updateBadge() {
+    const badge = document.getElementById('diaryCountBadge');
+    if (unreadCount > 0) {
+        badge.style.display = 'inline-flex';
+        badge.textContent = unreadCount;
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function recordActivity() {
+    unreadCount++;
+    safeStorage.setItem('aw_unread', unreadCount);
+    updateBadge();
+
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    if (streakData.lastDate === todayStr) return; // Schon heute einen Eintrag gemacht
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toLocaleDateString('en-CA');
+
+    if (streakData.lastDate === yesterdayStr) {
+        streakData.count++;
+    } else {
+        streakData.count = 1;
+    }
+    streakData.lastDate = todayStr;
+
+    // PopUp anzeigen wenn man durch 3 teilbare Tage hat und noch nicht benachrichtigt wurde
+    if (streakData.count > 0 && streakData.count % 3 === 0 && streakData.lastNotified !== streakData.count) {
+        streakData.lastNotified = streakData.count;
+        setTimeout(() => openModal('streakModal'), 600);
+    }
+    safeStorage.setItem('aw_streak', JSON.stringify(streakData));
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
+
+    if (tabId === 'diary') {
+        unreadCount = 0;
+        safeStorage.setItem('aw_unread', 0);
+        updateBadge();
+    }
+}
+
+function selectMood(btn) {
+    document.querySelectorAll('#moodGrid .mood-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedMood = { level: +btn.dataset.level, emoji: btn.dataset.emoji, label: btn.dataset.label };
+}
+
+function saveMoodEntry() {
+    if (!selectedMood) { showToast('Bitte wähle eine Stimmung.'); return; }
+    const entry = {
+        id: 'm_' + Date.now(), type: 'mood', timestamp: new Date().toISOString(),
+        moodEmoji: selectedMood.emoji, moodLabel: selectedMood.label, moodLevel: selectedMood.level,
+        happened: document.getElementById('moodHappened').value.trim() || '—',
+        positive: document.getElementById('moodPositive').value.trim() || '—',
+        negative: document.getElementById('moodNegative').value.trim() || '—'
+    };
+    diaryEntries.unshift(entry);
+    safeStorage.setItem('aw_entries', JSON.stringify(diaryEntries));
+
+    document.querySelectorAll('#moodGrid .mood-btn').forEach(b => b.classList.remove('selected'));
+    selectedMood = null;
+    ['moodHappened','moodPositive','moodNegative'].forEach(id => document.getElementById(id).value = '');
+
+    recordActivity();
+    renderDiary();
+    showToast('😊 Mood im Tagebuch gespeichert!');
+}
+
+function switchGoalMode(mode) {
+    currentGoalMode = mode;
+    document.getElementById('segDailyBtn').classList.toggle('active', mode === 'daily');
+    document.getElementById('segWeeklyBtn').classList.toggle('active', mode === 'weekly');
+    document.getElementById('goalInputLabel').textContent = mode === 'daily' ? 'Mein heutiges Tagesziel:' : 'Mein Wochenziel:';
+    document.getElementById('goalSaveBtnLabel').textContent = mode === 'daily' ? 'Tagesziel festlegen' : 'Wochenziel festlegen';
+    renderGoalSuggestions();
+    renderGoalSection();
+}
+
+function saveCustomGoalOption() {
+    const text = document.getElementById('goalTextInput').value.trim();
+    if (!text) { showToast('Bitte Text eingeben.'); return; }
+    customGoals[currentGoalMode].unshift(text); // Neuester immer oben
+    safeStorage.setItem('aw_custom_goals', JSON.stringify(customGoals));
+    renderGoalSuggestions();
+    showToast('Zur Auswahl hinzugefügt!');
+}
+
+function renderGoalSuggestions() {
+    const list = [...customGoals[currentGoalMode], ...(GOAL_SUGGESTIONS[currentGoalMode] || [])];
+    document.getElementById('goalSuggestionChips').innerHTML = list.map(t => {
+        const safeText = t.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+        return `<button type="button" class="chip" onclick="document.getElementById('goalTextInput').value='${safeText}'">+ ${t}</button>`;
+    }).join('');
+}
+
+function setNewGoal() {
+    const text = document.getElementById('goalTextInput').value.trim();
+    if (!text) { showToast('Bitte Ziel eingeben.'); return; }
+    activeGoals[currentGoalMode] = { text, scope: currentGoalMode, createdAt: new Date().toISOString() };
+    safeStorage.setItem('aw_goals', JSON.stringify(activeGoals));
+    document.getElementById('goalTextInput').value = '';
+    renderGoalSection();
+    showToast('🎯 Ziel aktiviert!');
+}
+
+function renderGoalSection() {
+    const active = activeGoals[currentGoalMode];
+    const box = document.getElementById('goalActiveBox');
+    if (!active) { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    document.getElementById('activeGoalHeader').textContent = currentGoalMode === 'daily' ? '☀️ Aktives Tagesziel' : '🌱 Aktives Wochenziel';
+    document.getElementById('activeGoalText').textContent = active.text;
+}
+
+function selectGoalEvaluation(achieved) {
+    selectedGoalAchieved = achieved;
+    document.getElementById('evalSuccessBtn').classList.toggle('active', achieved === true);
+    document.getElementById('evalFailBtn').classList.toggle('active', achieved === false);
+}
+
+function completeGoalReflection() {
+    const active = activeGoals[currentGoalMode];
+    if (!active || selectedGoalAchieved === null) { showToast('Bitte Zielstatus wählen.'); return; }
+    const entry = {
+        id: 'g_' + Date.now(), type: currentGoalMode === 'daily' ? 'daily_goal' : 'weekly_goal', timestamp: new Date().toISOString(),
+        goalScope: currentGoalMode === 'daily' ? 'Tagesziel' : 'Wochenziel',
+        goalText: active.text, achieved: selectedGoalAchieved,
+        reason: document.getElementById('goalReasonInput').value.trim() || '—',
+        whatDifferent: document.getElementById('goalDifferentInput').value.trim() || '—'
+    };
+    diaryEntries.unshift(entry);
+    activeGoals[currentGoalMode] = null;
+    selectedGoalAchieved = null;
+    safeStorage.setItem('aw_entries', JSON.stringify(diaryEntries));
+    safeStorage.setItem('aw_goals', JSON.stringify(activeGoals));
+
+    ['goalReasonInput','goalDifferentInput'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('evalSuccessBtn').classList.remove('active');
+    document.getElementById('evalFailBtn').classList.remove('active');
+
+    recordActivity();
+    renderGoalSection();
+    renderDiary();
+    showToast('🎯 Ziel-Reflexion gespeichert!');
+}
+
+function selectWinCategory(btn, cat) {
+    document.querySelectorAll('#winSizeChips .chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    selectedWinCategory = cat;
+}
+
+function saveWinEntry() {
+    const text = document.getElementById('winTextInput').value.trim();
+    if (!text) { showToast('Bitte Erfolg eingeben.'); return; }
+    const entry = { id: 'w_' + Date.now(), type: 'win', timestamp: new Date().toISOString(), category: selectedWinCategory, winText: text, celebrations: 1 };
+    diaryEntries.unshift(entry);
+    safeStorage.setItem('aw_entries', JSON.stringify(diaryEntries));
+    document.getElementById('winTextInput').value = '';
+
+    recordActivity();
+    renderWinsWall();
+    renderDiary();
+    showToast('🎉 Erfolg gefeiert & gespeichert!');
+}
+
+function celebrateWinAgain(id) {
+    const item = diaryEntries.find(e => e.id === id);
+    if (item) { item.celebrations = (item.celebrations || 1) + 1; safeStorage.setItem('aw_entries', JSON.stringify(diaryEntries)); renderWinsWall(); showToast('🎉 Erfolg gefeiert!'); }
+}
+
+function renderWinsWall() {
+    const wins = diaryEntries.filter(e => e.type === 'win');
+    document.getElementById('winsCountBadge').textContent = `${wins.length} Erfolge`;
+    document.getElementById('winsWallList').innerHTML = wins.length === 0 ? '<div style="font-size:12px; color:#94a3b8; text-align:center; padding:12px;">Noch keine Erfolge.</div>' : wins.map(w => `
+    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:10px; margin-bottom:6px;">
+    <div style="font-size:10.5px; font-weight:700; color:#b45309; margin-bottom:2px;">${w.category}</div>
+    <div style="font-size:13px; font-weight:600; color:#1e293b; margin-bottom:6px;">${w.winText}</div>
+    <button type="button" onclick="celebrateWinAgain('${w.id}')" style="background:#fef3c7; border:1px solid #f59e0b; color:#92400e; border-radius:999px; padding:3px 9px; font-size:10.5px; font-weight:700; cursor:pointer;">🎉 Feiern (${w.celebrations || 1}×</button>
+    </div>
+    `).join('');
+}
+
+function setDiaryFilter(btn, filter) {
+    currentDiaryFilter = filter;
+    document.querySelectorAll('#tab-diary .chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderDiary();
+}
+
+// Bearbeiten & Löschen Logik
+let confirmCallback = null;
+function showConfirm(title, text, onYes) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmText').textContent = text;
+    confirmCallback = onYes;
+    openModal('confirmModal');
+}
+document.getElementById('confirmYesBtn').onclick = () => {
+    closeModal('confirmModal');
+    if (confirmCallback) confirmCallback();
+};
+
+function requestDelete(id) {
+    showConfirm('Wirklich löschen?', 'Bist du sicher, dass du diesen Eintrag löschen möchtest? Das kann nicht rückgängig gemacht werden.', () => {
+        diaryEntries = diaryEntries.filter(e => e.id !== id);
+        safeStorage.setItem('aw_entries', JSON.stringify(diaryEntries));
+        renderWinsWall();
+        renderDiary();
+        showToast('Eintrag gelöscht.');
+    });
+}
+
+let editingId = null;
+function requestEdit(id) {
+    showConfirm('Eintrag bearbeiten?', 'Möchtest du den Text dieses Eintrags anpassen?', () => {
+        const item = diaryEntries.find(e => e.id === id);
+        if(!item) return;
+        editingId = id;
+        document.getElementById('editMoodWrap').style.display = 'none';
+        document.getElementById('editGoalWrap').style.display = 'none';
+        document.getElementById('editWinWrap').style.display = 'none';
+
+        if (item.type === 'mood') {
+            document.getElementById('editMoodWrap').style.display = 'block';
+            document.getElementById('emHappened').value = item.happened;
+            document.getElementById('emPos').value = item.positive;
+            document.getElementById('emNeg').value = item.negative;
+        } else if (item.type === 'daily_goal' || item.type === 'weekly_goal' || item.type === 'goal') {
+            document.getElementById('editGoalWrap').style.display = 'block';
+            document.getElementById('egText').value = item.goalText;
+            document.getElementById('egReason').value = item.reason;
+            document.getElementById('egDiff').value = item.whatDifferent;
+        } else if (item.type === 'win') {
+            document.getElementById('editWinWrap').style.display = 'block';
+            document.getElementById('ewText').value = item.winText;
+        }
+        openModal('editModal');
+    });
+}
+
+function saveEdit() {
+    const item = diaryEntries.find(e => e.id === editingId);
+    if(!item) return;
+    if(item.type === 'mood') {
+        item.happened = document.getElementById('emHappened').value.trim() || '—';
+        item.positive = document.getElementById('emPos').value.trim() || '—';
+        item.negative = document.getElementById('emNeg').value.trim() || '—';
+    } else if (item.type === 'daily_goal' || item.type === 'weekly_goal' || item.type === 'goal') {
+        item.goalText = document.getElementById('egText').value.trim() || '—';
+        item.reason = document.getElementById('egReason').value.trim() || '—';
+        item.whatDifferent = document.getElementById('egDiff').value.trim() || '—';
+    } else if (item.type === 'win') {
+        item.winText = document.getElementById('ewText').value.trim() || '—';
+    }
+    safeStorage.setItem('aw_entries', JSON.stringify(diaryEntries));
+    closeModal('editModal');
+    renderDiary();
+    if(item.type === 'win') renderWinsWall();
+    showToast('Änderungen gespeichert!');
+}
+
+function renderDiary() {
+    const filtered = currentDiaryFilter === 'all' ? diaryEntries : diaryEntries.filter(e => e.type === currentDiaryFilter || (currentDiaryFilter === 'daily_goal' && e.type === 'goal' && e.goalScope === 'Tagesziel') || (currentDiaryFilter === 'weekly_goal' && e.type === 'goal' && e.goalScope === 'Wochenziel'));
+    const container = document.getElementById('diaryEntriesContainer');
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="card empty-state"><div class="empty-icon">📖</div><h4>Tagebuch ist leer</h4><p>Deine Einträge erscheinen hier automatisch.</p></div>`;
+        return;
+    }
+
+    const groups = {};
+    filtered.forEach(item => {
+        const dKey = new Date(item.timestamp).toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+        if (!groups[dKey]) groups[dKey] = [];
+        groups[dKey].push(item);
+    });
+
+    container.innerHTML = Object.keys(groups).map(dKey => `
+    <div class="date-divider">📅 ${dKey}</div>
+    ${groups[dKey].map(item => {
+        const tStr = new Date(item.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
+        if (item.type === 'mood') return `
+        <div class="diary-item type-mood">
+        <div class="diary-top"><span class="diary-badge badge-mood">${item.moodEmoji} Mood: ${item.moodLabel}</span><div class="diary-time"><span>🕒 ${tStr}</span><button class="action-btn" onclick="requestEdit('${item.id}')" style="margin-left:8px;">✏️</button><button class="action-btn del" onclick="requestDelete('${item.id}')" style="margin-left:4px;">🗑️</button></div></div>
+        <div class="diary-detail-box"><strong>Geschehen:</strong> ${item.happened}</div>
+        <div class="diary-detail-box" style="background:#f0fdf4;"><strong>Positiv:</strong> ${item.positive}</div>
+        <div class="diary-detail-box" style="background:#fff1f2;"><strong>Negativ:</strong> ${item.negative}</div>
+        </div>`;
+        if (item.type === 'goal' || item.type === 'daily_goal' || item.type === 'weekly_goal') return `
+        <div class="diary-item type-goal">
+        <div class="diary-top"><span class="diary-badge badge-goal">🎯 ${item.goalScope}</span><div class="diary-time"><span>🕒 ${tStr}</span><button class="action-btn" onclick="requestEdit('${item.id}')" style="margin-left:8px;">✏️</button><button class="action-btn del" onclick="requestDelete('${item.id}')" style="margin-left:4px;">🗑️</button></div></div>
+        <div style="font-size:13.5px; font-weight:700; margin:4px 0;">${item.goalText} (${item.achieved ? '✅ Erreicht' : '⭕ Nicht erreicht'})</div>
+        <div class="diary-detail-box"><strong>Ursache:</strong> ${item.reason}</div>
+        <div class="diary-detail-box"><strong>Anders machen:</strong> ${item.whatDifferent}</div>
+        </div>`;
+        return `
+        <div class="diary-item type-win">
+        <div class="diary-top"><span class="diary-badge badge-win">🏆 ${item.category}</span><div class="diary-time"><span>🕒 ${tStr}</span><button class="action-btn" onclick="requestEdit('${item.id}')" style="margin-left:8px;">✏️</button><button class="action-btn del" onclick="requestDelete('${item.id}')" style="margin-left:4px;">🗑️</button></div></div>
+        <div class="diary-detail-box" style="background:#fffbeb; font-weight:600;">${item.winText}</div>
+        </div>`;
+    }).join('')}
+    `).join('');
+}
+
+function syncReminderUI() {
+    document.getElementById('reminderEnabledToggle').checked = reminderConfig.enabled;
+    document.getElementById('reminderTimeInput').value = reminderConfig.time || '19:00';
+    const btn = document.getElementById('headerReminderBtn');
+    if (reminderConfig.enabled) { btn.classList.add('active-reminder'); document.getElementById('headerReminderLabel').textContent = reminderConfig.time; document.getElementById('reminderStatusDot').style.display = 'inline'; }
+    else { btn.classList.remove('active-reminder'); document.getElementById('headerReminderLabel').textContent = 'Erinnerung'; document.getElementById('reminderStatusDot').style.display = 'none'; }
+
+    // Android Alarm setzen
+    if (window.AndroidApp && window.AndroidApp.scheduleNotification) {
+        window.AndroidApp.scheduleNotification(reminderConfig.enabled, reminderConfig.time || '19:00', reminderConfig.note);
+    }
+}
+
+function saveReminderSettings() {
+    reminderConfig.enabled = document.getElementById('reminderEnabledToggle').checked;
+    reminderConfig.time = document.getElementById('reminderTimeInput').value || '19:00';
+    safeStorage.setItem('aw_remind', JSON.stringify(reminderConfig));
+    syncReminderUI();
+}
+
+function triggerTestNotification() {
+    saveReminderSettings();
+    closeModal('reminderModal');
+
+    if (window.AndroidApp && window.AndroidApp.triggerTestNotification) {
+        // Native System-Notification triggern
+        window.AndroidApp.triggerTestNotification(reminderConfig.note);
+    } else {
+        // Fallback Web-Banner
+        document.getElementById('pushBannerText').textContent = reminderConfig.note;
+        document.getElementById('pushBanner').classList.add('show');
+    }
+}
+
+function checkReminder() {
+    if (!reminderConfig.enabled) return;
+    const now = new Date();
+    const hm = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    if (reminderConfig.time === hm && reminderConfig.lastTrig !== hm) {
+        reminderConfig.lastTrig = hm;
+        document.getElementById('pushBannerText').textContent = reminderConfig.note;
+        document.getElementById('pushBanner').classList.add('show');
+    }
+}
+
+function closePushBanner() { document.getElementById('pushBanner').classList.remove('show'); }
+function handlePushAction() { closePushBanner(); switchTab('mood'); }
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showToast(msg) {
+    const el = document.getElementById('toastMsg');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function toggleCustomDate() {
+    const val = document.getElementById('pdfDateFilter').value;
+    document.getElementById('pdfCustomDateWrap').style.display = val === 'custom' ? 'flex' : 'none';
+}
+
+function downloadDiaryAsPDF() {
+    const name = document.getElementById('pdfPatientName').value.trim();
+    const station = document.getElementById('pdfStationNote').value.trim();
+    const filter = document.getElementById('pdfDateFilter').value;
+
+    let filtered = diaryEntries;
+    const now = new Date();
+    now.setHours(0,0,0,0);
+
+    if (filter === 'today') {
+        filtered = diaryEntries.filter(e => {
+            const d = new Date(e.timestamp);
+            d.setHours(0,0,0,0);
+            return d.getTime() === now.getTime();
+        });
+    } else if (filter === 'last7') {
+        const last7 = new Date(now);
+        last7.setDate(last7.getDate() - 7);
+        filtered = diaryEntries.filter(e => {
+            const d = new Date(e.timestamp);
+            return d.getTime() >= last7.getTime();
+        });
+    } else if (filter === 'custom') {
+        const start = document.getElementById('pdfStartDate').value;
+        const end = document.getElementById('pdfEndDate').value;
+
+        let startT = 0;
+        let endT = Number.MAX_SAFE_INTEGER;
+
+        if (start) {
+            const s = new Date(start);
+            s.setHours(0,0,0,0);
+            startT = s.getTime();
+        }
+        if (end) {
+            const eD = new Date(end);
+            eD.setHours(23,59,59,999);
+            endT = eD.getTime();
+        }
+
+        filtered = diaryEntries.filter(e => {
+            const t = new Date(e.timestamp).getTime();
+            return t >= startT && t <= endT;
+        });
+    }
+
+    if (filtered.length === 0) {
+        showToast('Keine Einträge im gewählten Zeitraum.');
+        return;
+    }
+
+    const payload = {
+        name: name,
+        station: station,
+        blocks: []
+    };
+
+    let lastDateStr = '';
+
+    filtered.forEach(item => {
+        const dObj = new Date(item.timestamp);
+        const dateStr = dObj.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+        const timeStr = dObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
+
+        if (dateStr !== lastDateStr) {
+            payload.blocks.push({
+                isHeader: true,
+                title: dateStr,
+                color: "#334155",
+                lines: []
+            });
+            lastDateStr = dateStr;
+        }
+
+        let title = '';
+        let color = '#000000';
+        let lines = [];
+
+        if (item.type === 'mood') {
+            title = `[${timeStr}] 😊 Mood: ${item.moodLabel}`;
+            color = '#0f766e';
+            lines.push(`Geschehen: ${item.happened}`);
+            lines.push(`Positiv: ${item.positive}`);
+            lines.push(`Negativ: ${item.negative}`);
+        } else if (item.type === 'goal' || item.type === 'daily_goal' || item.type === 'weekly_goal') {
+            title = `[${timeStr}] 🎯 ${item.goalScope}`;
+            color = '#4338ca';
+            lines.push(`Ziel: ${item.goalText}`);
+            lines.push(`Status: ${item.achieved ? 'Erreicht' : 'Nicht erreicht'}`);
+            lines.push(`Ursache: ${item.reason}`);
+            lines.push(`Anders machen: ${item.whatDifferent}`);
+        } else if (item.type === 'win') {
+            title = `[${timeStr}] 🏆 ${item.category}`;
+            color = '#b45309';
+            lines.push(`Erfolg: ${item.winText}`);
+            if (item.celebrations > 1) {
+                lines.push(`(Gefeiert: ${item.celebrations}x)`);
+            }
+        }
+
+        payload.blocks.push({
+            isHeader: false,
+            title: title,
+            color: color,
+            lines: lines
+        });
+    });
+
+    if (window.AndroidApp && window.AndroidApp.generateAndSavePdf) {
+        window.AndroidApp.generateAndSavePdf(JSON.stringify(payload), 'Re_Mindful_Tagebuch.pdf');
+        closeModal('pdfModal');
+    } else {
+        showToast('PDF-Export nur in der App möglich.');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
