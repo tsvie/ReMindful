@@ -1,10 +1,17 @@
 # Re:Mindful - Klinik- & Befindlichkeitsbegleiter / Clinic & Wellness Companion
 
-![Re:Mindful App Icon](app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp) <!-- Du kannst hier später einen echten Bildlink einfügen -->
+![Re:Mindful App Icon](https://github.com/tsvie/ReMindful/blob/main/icon.png) <!-- Du kannst hier später einen echten Bildlink einfügen -->
 
 *🌍 For English description, please scroll down.*
 
 **Re:Mindful** ist ein sicherer, privater und offline-first Begleiter für Achtsamkeit, Mood-Tracking und das Dokumentieren persönlicher Erfolge. Die App wurde speziell entwickelt, um Menschen während eines Klinikaufenthalts, einer Therapie oder im achtsamen Alltag zu unterstützen.
+![screen1](https://github.com/tsvie/ReMindful/blob/main/screen%201.png)
+![screen2](https://github.com/tsvie/ReMindful/blob/main/screen%202.png)
+![screen3](https://github.com/tsvie/ReMindful/blob/main/screen%203.png)
+![screen4](https://github.com/tsvie/ReMindful/blob/main/screen%204.png)
+![screen5](https://github.com/tsvie/ReMindful/blob/main/screen%205.png)
+![screen6](https://github.com/tsvie/ReMindful/blob/main/screen%206.png)
+
 
 ## ✨ Features (Deutsch)
 
