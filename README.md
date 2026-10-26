@@ -4,6 +4,8 @@
 
 **Re:Mindful** ist ein sicherer, privater und offline-first Begleiter für Achtsamkeit, Mood-Tracking und das Dokumentieren persönlicher Erfolge. Die App wurde speziell entwickelt, um Menschen während eines Klinikaufenthalts, einer Therapie oder im achtsamen Alltag zu unterstützen.
 
+Du findest die App unter [Releases](https://github.com/tsvie/ReMindful/releases)
+
 ## ✨ Features
 
 * **😊 Mood-Tracker:** Halte täglich fest, wie du dich fühlst und reflektiere, was positiv oder belastend war.
